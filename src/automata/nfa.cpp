@@ -208,7 +208,7 @@ bool NFA::has_long_edges() const {
   return false;
 }
 
-void NFA::visualize(std::ofstream& out) const {
+void NFA::visualize(std::ostream& out) const {
   out << graph.size() << "";
   size_t edges = 0;
   for (int i = 0; i < graph.size(); ++i)

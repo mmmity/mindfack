@@ -25,7 +25,7 @@ class NFA : public BaseAutomata {
   void remove_empty_edges();
   void expand_edges();
   bool allows(const std::string&) const override;
-  void visualize(std::ofstream&) const override;
+  void visualize(std::ostream&) const override;
   int add_vertex(const std::vector<FromEdge>& from,
                  const std::vector<ToEdge>& to, bool term);
   size_t size() const override;
