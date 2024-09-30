@@ -184,7 +184,8 @@ size_t NFA::size() const {
 
 size_t NFA::edges() const {
   size_t ans = 0;
-  for (int i = 0; i < graph.size(); ++i) ans += graph[i].size();
+  for (int i = 0; i < graph.size(); ++i)
+    ans += graph[i].size();
   return ans;
 }
 

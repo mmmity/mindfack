@@ -1,6 +1,5 @@
 #include "automata/nfa.hpp"
 #include <gtest/gtest.h>
-#include <cstdio>
 #include <fstream>
 
 class NfaTest : public testing::Test {
@@ -32,7 +31,8 @@ class NfaTest : public testing::Test {
 
     std::ofstream aut_file_5("aut_file_5.nfa");
     aut_file_5 << "5 9\n";
-    aut_file_5 << "0 1 a\n 0 3 a\n1 2 b\n2 3 b\n3 4 b\n4 2 a\n4 0 #\n0 1 b\n2 4 a\n";
+    aut_file_5
+        << "0 1 a\n 0 3 a\n1 2 b\n2 3 b\n3 4 b\n4 2 a\n4 0 #\n0 1 b\n2 4 a\n";
     aut_file_5 << "4\n";
     aut_file_5.close();
   }

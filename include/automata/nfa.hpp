@@ -29,7 +29,7 @@ class NFA : public BaseAutomata {
   int add_vertex(const std::vector<FromEdge>& from,
                  const std::vector<ToEdge>& to, bool term);
   size_t size() const override;
-  size_t edges()const ;
+  size_t edges() const;
   bool has_empty_edges() const;
   bool has_long_edges() const;
 
