@@ -53,6 +53,11 @@ void NFA::remove_edge(size_t v, const ToEdge& e) {
   std::erase(rev_graph[e.to], FromEdge{e.by, v});
 }
 
+void NFA::add_edge(size_t v, ToEdge e) {
+  rev_graph[e.to].push_back({e.by, v});
+  graph[v].push_back(std::move(e));
+}
+
 void NFA::expand_edge(size_t v, const ToEdge& e) {
   size_t n = e.by.size();
   size_t last_vertex = v;
@@ -178,6 +183,112 @@ bool NFA::allows(const std::string& word) const {
   return dp[0][0];
 }
 
+size_t NFA::terminal_count() const {
+  return std::accumulate(terminal.begin(), terminal.end(), 0);
+}
+
+void NFA::make_one_terminal_vertex() {
+  if (terminal_count() == 1) return;
+  size_t vertex_id = graph.size();
+  graph.push_back({});
+  rev_graph.push_back({});
+  for (size_t i = 0; i < terminal.size(); ++i) {
+    if (terminal[i]) {
+      graph[i].push_back({"", vertex_id});
+      rev_graph[vertex_id].push_back({"", i});
+      terminal[i] = false;
+    }
+  }
+  terminal.push_back(true);
+}
+
+void NFA::parallel(NFA other) {
+  make_one_terminal_vertex();
+  other.make_one_terminal_vertex();
+  std::vector<std::vector<ToEdge>> new_graph(other.size() + size() + 2);
+  std::vector<std::vector<FromEdge>> new_rev_graph(other.size() + size() + 2);
+  new_graph[0].push_back({"", 1});
+  new_rev_graph[1].push_back({"", 0});
+  new_graph[0].push_back({"", size() + 1});
+  new_rev_graph[size() + 1].push_back({"", 0});
+
+  for (size_t i = 0; i < graph.size(); ++i) {
+    if (terminal[i]) {
+      new_graph[i + 1].push_back({"", size() + other.size() + 1});
+      new_rev_graph[size() + other.size() + 1].push_back({"", i + 1});
+    }
+    for (const ToEdge& e : graph[i]) {
+      new_graph[i + 1].push_back({e.by, e.to + 1});
+      new_rev_graph[e.to + 1].push_back({e.by, i + 1});
+    }
+  }
+
+  for (size_t i = 0; i < other.graph.size(); ++i) {
+    if (other.terminal[i]) {
+      new_graph[i + 1 + size()].push_back({"", size() + other.size() + 1});
+      new_rev_graph[size() + other.size() + 1].push_back({"", i + 1 + size()});
+    }
+    for (const ToEdge& e : other.graph[i]) {
+      new_graph[i + 1 + size()].push_back({e.by, e.to + 1 + size()});
+      new_rev_graph[e.to + 1 + size()].push_back({e.by, i + 1 + size()});
+    }
+  }
+
+  terminal.assign(size() + other.size() + 2, false);
+  terminal[size() + other.size() + 1] = true;
+  graph = new_graph;
+  rev_graph = new_rev_graph;
+}
+
+void NFA::consecutive(NFA other) {
+  make_one_terminal_vertex();
+  other.make_one_terminal_vertex();
+
+  size_t current_size = size();
+  graph.back().push_back({"", current_size});
+  graph.resize(current_size + other.size());
+  rev_graph.resize(current_size + other.size());
+  rev_graph[current_size].push_back({"", current_size - 1});
+  terminal.assign(current_size + other.size(), false);
+
+  for (size_t i = 0; i < other.size(); ++i) {
+    if (other.terminal[i]) terminal[i + current_size] = true;
+    for (const ToEdge& e : other.graph[i]) {
+      graph[i + current_size].push_back({e.by, e.to + current_size});
+      rev_graph[e.to + current_size].push_back({e.by, i + current_size});
+    }
+  }
+}
+
+void NFA::klini_asterisk() {
+  make_one_terminal_vertex();
+  std::vector<std::vector<ToEdge>> new_graph(size() + 1);
+  std::vector<std::vector<FromEdge>> new_rev_graph(size() + 1);
+  for (size_t i = 0; i < graph.size(); ++i) {
+    if (terminal[i]) {
+      new_graph[i + 1].push_back({"", 0});
+      new_rev_graph[0].push_back({"", i + 1});
+    }
+    for (const ToEdge& e : graph[i]) {
+      new_graph[i + 1].push_back({e.by, e.to + 1});
+      new_rev_graph[e.to + 1].push_back({e.by, i + 1});
+    }
+  }
+  new_graph[0].push_back({"", 1});
+  new_rev_graph[1].push_back({"", 0});
+
+  terminal.assign(size() + 1, false);
+  terminal[0] = true;
+  graph = new_graph;
+  rev_graph = new_rev_graph;
+}
+
+void NFA::klini_plus() {
+  NFA asterisk = *this;
+  asterisk.klini_asterisk();
+  consecutive(asterisk);
+}
+
 size_t NFA::size() const {
   return graph.size();
 }
@@ -210,7 +321,7 @@ bool NFA::has_long_edges() const {
 }
 
 void NFA::visualize(std::ostream& out) const {
-  out << graph.size() << "";
+  out << graph.size() << " ";
   size_t edges = 0;
   for (int i = 0; i < graph.size(); ++i)
     edges += graph[i].size();

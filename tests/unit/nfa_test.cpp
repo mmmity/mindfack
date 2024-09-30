@@ -173,3 +173,49 @@ TEST_F(NfaTest, TestEmptyEdgeRemoval) {
   ASSERT_EQ(nfa1.edges(), 3);
   ASSERT_TRUE(nfa1.allows("") && nfa1.allows("abababab"));
 }
+
+TEST_F(NfaTest, TestOperations) {
+  NFA nfa1;
+  nfa1.add_vertex({{"a", 0}}, {}, true);
+  nfa1.add_vertex({{"b", 0}}, {}, true);
+
+  NFA nfa2;
+  nfa2.add_vertex({{"c", 0}}, {}, true);
+  nfa2.add_vertex({{"d", 0}}, {}, true);
+
+  std::vector<std::pair<std::string, bool>> allowing1 = {{"a", true}, {"b", true}, {"c", false}, {"d", false}, {"ab", false}, {"ac", false}, {"aa", false}, {"bb", false}, {"bc", false}, {"ad", false}, {"bd", false}};
+  std::vector<std::pair<std::string, bool>> allowing2 = {{"a", false}, {"b", false}, {"c", true}, {"d", true}, {"ab", false}, {"ac", false}, {"aa", false}, {"bb", false}, {"bc", false}, {"ad", false}, {"bd", false}};
+
+  for (auto [str, result] : allowing1) ASSERT_EQ(result, nfa1.allows(str));
+  for (auto [str, result] : allowing2) ASSERT_EQ(result, nfa2.allows(str));
+
+  NFA nfa3 = nfa1;
+  NFA nfa4 = nfa1;
+  nfa3.parallel(nfa2);
+  nfa4.consecutive(nfa2);
+
+  std::vector<std::pair<std::string, bool>> allowing3 = {{"a", true}, {"b", true}, {"c", true}, {"d", true}, {"ab", false}, {"ac", false}, {"aa", false}, {"bb", false}, {"bc", false}, {"ad", false}, {"bd", false}};
+  std::vector<std::pair<std::string, bool>> allowing4 = {{"a", false}, {"b", false}, {"c", false}, {"d", false}, {"ab", false}, {"ac", true}, {"aa", false}, {"bb", false}, {"bc", true}, {"ad", true}, {"bd", true}};
+
+  for (auto [str, result] : allowing3) ASSERT_EQ(result, nfa3.allows(str));
+  for (auto [str, result] : allowing4) ASSERT_EQ(result, nfa4.allows(str));
+
+  NFA nfa5 = nfa3;
+  NFA nfa6 = nfa3;
+  NFA nfa7 = nfa4;
+  NFA nfa8 = nfa4;
+  nfa5.klini_asterisk();
+  nfa6.klini_plus();
+  nfa7.klini_asterisk();
+  nfa8.klini_plus();
+
+  std::vector<std::pair<std::string, bool>> allowing5 = {{"", true}, {"a", true}, {"aa", true}, {"aaaaa", true}, {"acacacac", true}, {"abcdabcd", true}, {"acbdacbd", true}, {"e", false}, {"aaaaaaae", false}};
+  std::vector<std::pair<std::string, bool>> allowing6 = {{"", false}, {"a", true}, {"aa", true}, {"aaaaa", true}, {"acacacac", true}, {"abcdabcd", true}, {"acbdacbd", true}, {"e", false}, {"aaaaaaae", false}};
+  std::vector<std::pair<std::string, bool>> allowing7 = {{"", true}, {"a", false}, {"aa", false}, {"aaaaa", false}, {"acacacac", true}, {"abcdabcd", false}, {"acbdacbd", true}, {"e", false}, {"aaaaaaae", false}};
+  std::vector<std::pair<std::string, bool>> allowing8 = {{"", false}, {"a", false}, {"aa", false}, {"aaaaa", false}, {"acacacac", true}, {"abcdabcd", false}, {"acbdacbd", true}, {"e", false}, {"aaaaaaae", false}};
+
+  for (auto [str, result] : allowing5) ASSERT_EQ(result, nfa5.allows(str));
+  for (auto [str, result] : allowing6) ASSERT_EQ(result, nfa6.allows(str));
+  for (auto [str, result] : allowing7) ASSERT_EQ(result, nfa7.allows(str));
+  for (auto [str, result] : allowing8) ASSERT_EQ(result, nfa8.allows(str));
+}

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <deque>
 #include <fstream>
+#include <numeric>
 #include <vector>
 #include "automata/base_automata.hpp"
 
@@ -35,6 +36,14 @@ class NFA : public BaseAutomata {
 
   NFA& operator=(const NFA& other) = default;
 
+  void make_one_terminal_vertex();
+  void parallel(NFA other);
+  void consecutive(NFA other);
+  void klini_asterisk();
+  void klini_plus();
+
+  size_t terminal_count() const;
+
  private:
   std::vector<std::vector<ToEdge>> graph{};
   std::vector<std::vector<FromEdge>> rev_graph{};
@@ -42,6 +51,7 @@ class NFA : public BaseAutomata {
 
   void load_from_file(const char* filename);
   void remove_edge(size_t v, const ToEdge& e);
+  void add_edge(size_t v, ToEdge e);
   void expand_edge(size_t v, const ToEdge& edge);
 
   friend class DFA;
