@@ -55,11 +55,12 @@ add_executable(
 
     ${PROJECT_SOURCE_DIR}/src/automata/nfa.cpp
     ${PROJECT_SOURCE_DIR}/src/automata/dfa.cpp
+    ${PROJECT_SOURCE_DIR}/src/regular/reg_parser.cpp
 )
 
 target_include_directories(
     main
-    PRIVATE include
+    PRIVATE ${PROJECT_SOURCE_DIR}/include
 )
 
 include(cmake/CodeCoverage.cmake)
