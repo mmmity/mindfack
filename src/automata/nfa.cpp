@@ -188,7 +188,7 @@ size_t NFA::terminal_count() const {
 }
 
 void NFA::make_one_terminal_vertex() {
-  if (terminal_count() == 1) return;
+  if (terminal_count() == 1 && terminal.back()) return;
   size_t vertex_id = graph.size();
   graph.push_back({});
   rev_graph.push_back({});
@@ -332,6 +332,7 @@ void NFA::visualize(std::ostream& out) const {
     }
   }
 
+  out << "terminal: ";
   for (int i = 0; i < graph.size(); ++i) {
     if (terminal[i])
       out << i << " ";
