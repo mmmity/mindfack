@@ -1,4 +1,5 @@
 #include "automata/nfa.hpp"
+#include "automata/rfa.hpp"
 
 NFA::NFA() : graph(1), rev_graph(1), terminal(1, false) {}
 

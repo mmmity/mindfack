@@ -55,6 +55,7 @@ add_executable(
 
     ${PROJECT_SOURCE_DIR}/src/automata/nfa.cpp
     ${PROJECT_SOURCE_DIR}/src/automata/dfa.cpp
+    ${PROJECT_SOURCE_DIR}/src/automata/rfa.cpp
     ${PROJECT_SOURCE_DIR}/src/regular/reg_parser.cpp
 )
 

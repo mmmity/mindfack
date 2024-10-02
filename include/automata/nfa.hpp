@@ -7,6 +7,8 @@
 #include <vector>
 #include "automata/base_automata.hpp"
 
+class RFA;
+
 class NFA : public BaseAutomata {
  public:
   struct ToEdge {
@@ -34,6 +36,7 @@ class NFA : public BaseAutomata {
   bool has_empty_edges() const;
   bool has_long_edges() const;
 
+  NFA(const NFA& other) = default;
   NFA& operator=(const NFA& other) = default;
 
   void make_one_terminal_vertex();
@@ -44,7 +47,7 @@ class NFA : public BaseAutomata {
 
   size_t terminal_count() const;
 
- private:
+ protected:
   std::vector<std::vector<ToEdge>> graph{};
   std::vector<std::vector<FromEdge>> rev_graph{};
   std::vector<bool> terminal{};
