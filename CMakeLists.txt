@@ -50,8 +50,8 @@ FetchContent_MakeAvailable(cpr_repo googletest)
 
 
 add_executable(
-    main 
-    ${PROJECT_SOURCE_DIR}/src/main.cpp
+    mindfack 
+    ${PROJECT_SOURCE_DIR}/src/mindfack.cpp
 
     ${PROJECT_SOURCE_DIR}/src/automata/nfa.cpp
     ${PROJECT_SOURCE_DIR}/src/automata/dfa.cpp
@@ -60,7 +60,7 @@ add_executable(
 )
 
 target_include_directories(
-    main
+    mindfack
     PRIVATE ${PROJECT_SOURCE_DIR}/include
 )
 

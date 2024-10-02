@@ -242,3 +242,19 @@ void DFA::visualize(std::ostream& out) const {
   }
   out << "\n";
 }
+
+NFA DFA::get_nfa() {
+  NFA out;
+  out.graph.resize(size());
+  out.rev_graph.resize(size());
+  out.terminal.resize(size(), false);
+  for (size_t i = 0; i < graph.size(); ++i) {
+    for (auto [c, to] : graph[i]) {
+      out.graph[i].push_back({std::string(1, c), to});
+      out.rev_graph[to].push_back({std::string(1, c), i});
+    }
+    if (terminal[i]) out.terminal[i] = true;
+  }
+
+  return out;
+}

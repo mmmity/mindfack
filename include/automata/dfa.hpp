@@ -20,6 +20,8 @@ class DFA : public BaseAutomata {
   void minimize();
   void make_complement();
 
+  NFA get_nfa();
+
   DFA& operator=(const DFA&) = default;
 
   void visualize(std::ostream&) const override;
